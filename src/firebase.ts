@@ -2,18 +2,18 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs } from 'firebase/firestore';
 const firebaseConfig = {
-  projectId: "ninth-list-wr5vm",
-  appId: "1:301472867796:web:e3a06e8e34e474a7b2e241",
-  apiKey: "AIzaSyDC25PmQ03nO8sqp0iVCWs7dgQu3UXYtMo",
-  authDomain: "ninth-list-wr5vm.firebaseapp.com",
-  firestoreDatabaseId: "ai-studio-f50c50e4-86ff-4cbc-9d20-d55cfa97f415",
-  storageBucket: "ninth-list-wr5vm.firebasestorage.app",
-  messagingSenderId: "301472867796",
-  measurementId: ""
+  apiKey: "AIzaSyCbwtxnIo9Yeqs0-g1DN_0-ng_pixru-kE",
+  authDomain: "habit-bcedf.firebaseapp.com",
+  databaseURL: "https://habit-bcedf-default-rtdb.firebaseio.com",
+  projectId: "habit-bcedf",
+  storageBucket: "habit-bcedf.firebasestorage.app",
+  messagingSenderId: "1085914019159",
+  appId: "1:1085914019159:web:168e5a8930b1d6b978fa12",
+  measurementId: "G-HGEJH39P11"
 };
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+export const db = getFirestore(app); // Uses the default Firestore database
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 
