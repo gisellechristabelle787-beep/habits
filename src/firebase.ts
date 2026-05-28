@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signOut as firebaseSignOut, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs } from 'firebase/firestore';
 const firebaseConfig = {
   apiKey: "AIzaSyCbwtxnIo9Yeqs0-g1DN_0-ng_pixru-kE",
@@ -21,8 +21,12 @@ export const signInWithGoogle = async () => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
     return result.user;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error signing in with Google", error);
+    if (error.code === 'auth/popup-blocked') {
+         await signInWithRedirect(auth, googleProvider);
+         return null; 
+    }
     throw error;
   }
 };
