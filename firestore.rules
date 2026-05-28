@@ -1,0 +1,71 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Auth helpers
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+
+    // User Profile Validation
+    function isValidUser(data) {
+      return data.email is string
+          && data.xp is number
+          && data.coins is number
+          && data.health is number
+          && data.streak is number;
+    }
+
+    // Task Validation
+    function isValidTask(data) {
+      return data.text is string && data.text.size() <= 300
+          && data.completed is bool
+          && data.xpReward is number
+          && data.healthReward is number
+          && data.completionCount is number;
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) && isValidId(userId);
+      allow create: if isOwner(userId) && isValidId(userId)
+                    && isValidUser(incoming());
+      // For updates we allow partial sets of valid type. This is permissive but required for simple app structure until hardened.
+      // To harden we enforce type shapes.
+      allow update: if isOwner(userId) && isValidId(userId)
+                    // If properties exist, they must be of correct type
+                    && (!('xp' in incoming()) || incoming().xp is number)
+                    && (!('coins' in incoming()) || incoming().coins is number)
+                    && (!('health' in incoming()) || incoming().health is number)
+                    && (!('streak' in incoming()) || incoming().streak is number)
+                    && (!('email' in incoming()) || incoming().email is string)
+                    && (!('tasks' in incoming()) || incoming().tasks is list)
+                    && (!('history' in incoming()) || incoming().history is list)
+                    && (!('equippedCompanionId' in incoming()) || incoming().equippedCompanionId is string)
+                    && (!('equippedOutfitId' in incoming()) || incoming().equippedOutfitId is string || incoming().equippedOutfitId == null)
+                    && (!('lastHabitDate' in incoming()) || incoming().lastHabitDate is string || incoming().lastHabitDate == null)
+                    && (!('lastLoginDate' in incoming()) || incoming().lastLoginDate is string)
+                    && (!('defeatedAdversaries' in incoming()) || incoming().defeatedAdversaries is list)
+                    && (!('ownedItems' in incoming()) || incoming().ownedItems is list)
+                    && (!('unlockedAchievements' in incoming()) || incoming().unlockedAchievements is list);
+
+      match /tasks/{taskId} {
+         allow read: if isOwner(userId) && isValidId(userId) && isValidId(taskId);
+         allow create: if isOwner(userId) && isValidId(userId) && isValidId(taskId)
+                       && isValidTask(incoming());
+         allow update: if isOwner(userId) && isValidId(userId) && isValidId(taskId)
+                       && (!('text' in incoming()) || (incoming().text is string && incoming().text.size() <= 300))
+                       && (!('completed' in incoming()) || incoming().completed is bool)
+                       && (!('xpReward' in incoming()) || incoming().xpReward is number)
+                       && (!('healthReward' in incoming()) || incoming().healthReward is number)
+                       && (!('completionCount' in incoming()) || incoming().completionCount is number);
+         allow delete: if isOwner(userId) && isValidId(userId) && isValidId(taskId);
+      }
+    }
+  }
+}

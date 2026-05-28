@@ -1,0 +1,47 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and stats",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "xp": { "type": "number" },
+        "coins": { "type": "number" },
+        "health": { "type": "number" },
+        "streak": { "type": "number" },
+        "lastHabitDate": { "type": "string" },
+        "equippedCompanionId": { "type": "string" },
+        "equippedOutfitId": { "type": "string" },
+        "defeatedAdversaries": { "type": "array", "items": { "type": "string" } },
+        "ownedItems": { "type": "array", "items": { "type": "string" } },
+        "unlockedAchievements": { "type": "array", "items": { "type": "string" } },
+        "lastLoginDate": { "type": "string" }
+      },
+      "required": ["email", "xp", "coins", "health", "streak"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "A user's habit",
+      "type": "object",
+      "properties": {
+        "text": { "type": "string" },
+        "completed": { "type": "boolean" },
+        "xpReward": { "type": "number" },
+        "healthReward": { "type": "number" },
+        "completionCount": { "type": "number" }
+      },
+      "required": ["text", "completed", "xpReward", "healthReward", "completionCount"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "Store user core stats."
+    },
+    "users/{userId}/tasks/{taskId}": {
+      "schema": "Task",
+      "description": "Store user's habits/tasks"
+    }
+  }
+}
