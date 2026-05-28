@@ -5,12 +5,15 @@ import { Sparkles, Mail, Lock } from 'lucide-react';
 
 export function AuthScreen() {
   const { login } = useAppContext();
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleGoogleLogin = async () => {
+    setErrorMsg(null);
     try {
       await login(); // We just trigger the google popup now
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
+      setErrorMsg(e.message || "Failed to sign in. Check your Firebase Authorized Domains if this is a live deployment.");
     }
   };
 
@@ -49,6 +52,12 @@ export function AuthScreen() {
           <img src="https://res.cloudinary.com/dhbxrnxd5/image/upload/v1779959328/Screenshot_2026-05-28_at_11.23.05-removebg-preview_rcmzjb.png" alt="Google" className="w-6 h-6 bg-white rounded-full p-0.5 object-contain" />
           Continue with Google
         </button>
+
+        {errorMsg && (
+          <p className="mt-4 text-[12px] text-error font-medium text-center bg-error/10 p-2 rounded-xl">
+            {errorMsg}
+          </p>
+        )}
 
       </motion.div>
     </div>
